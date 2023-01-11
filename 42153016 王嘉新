@@ -1,0 +1,187 @@
+Question 1
+from typing import List
+from collections import namedtuple
+from operator import itemgetter
+import time
+
+# Define point: If it's a point, return a coordinate (x, y).
+class Point(namedtuple("Point", "x y")):
+    def __repr__(self) -> str:
+        return f'Point{tuple(self)!r}'
+        
+# Define rectangle:If it's a rectangle, return a coordinate (lower, upper).
+class Rectangle(namedtuple("Rectangle", "lower upper")):
+    def __repr__(self) -> str:
+        return f'Rectangle{tuple(self)!r}'
+
+    # Define is_contains: Determines whether the point is inside the rectangle (The coordinates of points should be within the lower and upper of rectangle)
+    def is_contains(self, p: Point) -> bool:
+        return self.lower.x <= p.x <= self.upper.x and self.lower.y <= p.y <= self.upper.y
+
+# Define None (the node of KD tree)：return (own coordinate, left subtree node coordinate, right subtree node coordinate).
+class Node(namedtuple("Node", "location left right")):
+    """
+    location: Point
+    left: Node
+    right: Node
+    """
+
+    def __repr__(self):
+        return f'{tuple(self)!r}'
+
+# Define KD tree.
+class KDTree:
+    """k-d tree"""
+
+    def __init__(self):
+        self._root = None
+        self._n = 0
+        self._l = []
+        
+# Define insert: Insert a sequence of nodes and maintain the features of the KD tree.
+    def insert(self, p: List[Point],depth=0):
+        """insert a list of points"""
+        if not p:
+            return None
+        
+# Define range: Range is used to find the nodes inside the rectangle in the KD tree.
+    def range(self, rectangle: Rectangle) -> List[Point]:
+        """range query"""
+        Pass
+
+# Define range_test: Determine whether the result of the range function is correct.
+def range_test():
+    points = [Point(7, 2), Point(5, 4), Point(9, 6), Point(4, 7), Point(8, 1), Point(2, 3)]
+    kd = KDTree()
+    kd.insert(points)
+    # print(kd._root)
+    result = kd.range(Rectangle(Point(0, 0), Point(6, 6)))
+    # print(result)
+    assert sorted(result) == sorted([Point(2, 3), Point(5, 4)])
+# If it is incorrect, assert will report an error.
+
+# Defines performance: Defines 1,000,000 numbers from (0,0) to (999,999)
+# Record the time for naive method and using kdtree to find the node in rectangle.
+def performance_test():
+    points = [Point(x, y) for x in range(1000) for y in range(1000)]
+
+    lower = Point(500, 500)
+    upper = Point(504, 504)
+    rectangle = Rectangle(lower, upper)
+    #  naive method
+    start = int(round(time.time() * 1000))
+    result1 = [p for p in points if rectangle.is_contains(p)]
+    end = int(round(time.time() * 1000))
+    print(f'Naive method: {end - start}ms')
+
+    kd = KDTree()
+    kd.insert(points)
+    # k-d tree
+    start = int(round(time.time() * 1000))
+    result2 = kd.range(rectangle)
+    end = int(round(time.time() * 1000))
+    print(f'K-D tree: {end - start}ms')
+    if not sorted(result1) == sorted(result2):
+        print(sorted(result1),sorted(result2))
+    assert sorted(result1) == sorted(result2)
+
+if __name__ == '__main__':
+    range_test()
+    performance_test()
+
+
+
+
+
+Question 2
+ # Define insert: 
+ # First step: Select axis based on depth so that axis cycles through all valid values.
+ # Second step: Sort the orginal data, take the median number as segmentation number. 
+ # Third step: Build the node with median number, and then take the number less than median number as the left subtree and the number greater than median number as the right subtree.
+ def insert(self, p: List[Point],depth=0):
+        """insert a list of points"""
+        if not p:
+            return None
+        # dimension
+        k = 2  
+        # cutting dimension
+        axis = depth % k
+
+        # sort the orginal data, take the median number to segmente
+        p.sort(key=itemgetter(axis))
+        median = len(p) // 2
+
+        # if the coordinate node value is less than median, insert it in the left subtree
+        # else insert in the right subtree
+        self._l.append(p[median])
+        self._n += 1
+        self._root = Node(
+            location=p[median],
+            left=self.insert(p[:median], depth + 1),
+            right=self.insert(p[median + 1 :], depth + 1),
+        )
+        return self._root
+    def range(self, rectangle: Rectangle) -> List[Point]:
+        """range query"""
+        def find_point(root,rectangle: Rectangle,res):
+            # 从根节点开始遍历
+            while root:
+                # print(root)
+                # if root.location.x == 504:
+                #     print(rectangle.lower.x <= root.location.x <= rectangle.upper.x,root.location)
+                # 当节点的x属性在范围之内时
+                if rectangle.lower.x <= root.location.x <= rectangle.upper.x:
+
+                    if rectangle.lower.y <= root.location.y <= rectangle.upper.y:
+                        
+                        # print(root.location)
+                        res.append(root.location)
+
+                        find_point(root.left,rectangle,res)
+
+                        find_point(root.right,rectangle,res)
+                        return 
+
+                    # 当节点的y属性小于最小rectangle的x时
+                    # 由于节点的左子树y都小于y，故只用遍历右子树
+                    elif rectangle.lower.y > root.location.y:
+                        root = root.right
+                    # 同理，当节点的y属性小于最小rectangle的x时只遍历左子树
+                    else:
+                        root =root.left
+
+                # 当节点的x属性小于最小rectangle的x时
+                # 由于节点的左子树x都小于x，故只用遍历右子树
+                elif rectangle.lower.x > root.location.x:
+                    root = root.right
+                else:
+                    root = root.left
+        # 当根节点<
+        res = []
+        start = int(round(time.time() * 1000))
+        find_point(self._root,rectangle,res)
+        end = int(round(time.time() * 1000))
+        print(start,end)
+        return res
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
