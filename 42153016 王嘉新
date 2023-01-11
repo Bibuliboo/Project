@@ -1,4 +1,4 @@
-Question 1
+# Question 1
 from typing import List
 from collections import namedtuple
 from operator import itemgetter
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
 
 
-Question 2
+ # Question 2
  # Define insert: 
  # First step: Select axis based on depth so that axis cycles through all valid values.
  # Second step: Sort the orginal data, take the median number as segmentation number. 
@@ -121,67 +121,30 @@ Question 2
             right=self.insert(p[median + 1 :], depth + 1),
         )
         return self._root
-    def range(self, rectangle: Rectangle) -> List[Point]:
-        """range query"""
-        def find_point(root,rectangle: Rectangle,res):
-            # 从根节点开始遍历
-            while root:
-                # print(root)
-                # if root.location.x == 504:
-                #     print(rectangle.lower.x <= root.location.x <= rectangle.upper.x,root.location)
-                # 当节点的x属性在范围之内时
-                if rectangle.lower.x <= root.location.x <= rectangle.upper.x:
-
-                    if rectangle.lower.y <= root.location.y <= rectangle.upper.y:
-                        
-                        # print(root.location)
-                        res.append(root.location)
-
-                        find_point(root.left,rectangle,res)
-
-                        find_point(root.right,rectangle,res)
-                        return 
-
-                    # 当节点的y属性小于最小rectangle的x时
-                    # 由于节点的左子树y都小于y，故只用遍历右子树
-                    elif rectangle.lower.y > root.location.y:
-                        root = root.right
-                    # 同理，当节点的y属性小于最小rectangle的x时只遍历左子树
-                    else:
-                        root =root.left
-
-                # 当节点的x属性小于最小rectangle的x时
-                # 由于节点的左子树x都小于x，故只用遍历右子树
-                elif rectangle.lower.x > root.location.x:
-                    root = root.right
-                else:
-                    root = root.left
-        # 当根节点<
-        res = []
-        start = int(round(time.time() * 1000))
-        find_point(self._root,rectangle,res)
-        end = int(round(time.time() * 1000))
-        print(start,end)
-        return res
+        
 
 
 
 
+ # Question 3
+ # When KDTree is a linear-like tree, the range operation needs to traverse each node, so O worst = O(n)
+ # When KDTree is a total binary tree , in best situation, we only need to search half nodes during every recursion, so O best = O(logn) 
+ 
+ 
+ 
+ 
+ 
+ # Question 4
+    plt.rcParams["font.sans-serif"] = ["SimHei"]
+    plt.rcParams["axes.unicode_minus"] = False
 
+    print(p_time,q_time)
+    plt.plot(num,p_time,color="blue",label="naive method")
+    plt.plot(num,q_time,color="red",label="kdtree method")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    plt.legend() # plt dra
+    plt.grid() # Add grid
+    plt.xlabel("range")
+    plt.ylabel("time(/ms)")
+    plt.savefig('./'+'KDtree.png') # Save picture
+    plt.show()
